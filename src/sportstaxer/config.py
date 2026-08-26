@@ -7,6 +7,7 @@ stage can be driven from a test fixture.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Literal
 
 import yaml
 from pydantic import BaseModel, Field, ValidationError
@@ -25,6 +26,14 @@ class DedupConfig(BaseModel):
     hash_distance: int = Field(default=4, ge=0)
 
 
+class FramesConfig(BaseModel):
+    image_format: Literal["png", "jpg"] = "png"
+    jpeg_quality: int = Field(default=90, ge=1, le=100)
+    # Grayscale standard deviation below which a frame counts as featureless. A
+    # FLAG_SECURE capture reads as 0; real frames of a dark app UI measure above 20.
+    blank_std_threshold: float = Field(default=3.0, ge=0.0)
+
+
 class StitchConfig(BaseModel):
     # Cross-correlation score below which the offset estimate is not trusted and a gap
     # marker is recorded instead of splicing.
@@ -37,6 +46,7 @@ class Config(BaseModel):
     model_config = {"extra": "forbid"}
 
     fps: float = Field(default=2.0, gt=0)
+    frames: FramesConfig = FramesConfig()
     dedup: DedupConfig = DedupConfig()
     stitch: StitchConfig = StitchConfig()
     work_dir: Path = Path("work")

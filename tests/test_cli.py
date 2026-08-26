@@ -1,4 +1,5 @@
 import json
+import shutil
 
 import pytest
 
@@ -22,3 +23,19 @@ def test_no_subcommand_is_usage_error():
     with pytest.raises(SystemExit) as exc:
         main([])
     assert exc.value.code == 2
+
+
+def test_frames_command_reports_counts(scroll_video, tmp_path, monkeypatch, capsys):
+    if shutil.which("ffmpeg") is None:
+        pytest.skip("ffmpeg not on PATH")
+    (tmp_path / "sportstaxer.yaml").write_text("work_dir: work\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+
+    assert main(["frames", str(scroll_video), "--run-id", "r1"]) == 0
+    assert "frames kept" in capsys.readouterr().out
+    assert (tmp_path / "work" / "r1" / "frames" / "manifest.json").is_file()
+
+
+def test_frames_command_reports_missing_video(tmp_path, capsys):
+    assert main(["frames", str(tmp_path / "nope.mp4")]) == 1
+    assert "video not found" in capsys.readouterr().err
