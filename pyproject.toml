@@ -12,6 +12,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+vision = ["anthropic>=0.40"]
+ocr = ["pytesseract>=0.3.10"]
 dev = [
     "pytest>=8.0",
     "ruff>=0.4",

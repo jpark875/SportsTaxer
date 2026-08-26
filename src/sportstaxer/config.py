@@ -34,6 +34,21 @@ class FramesConfig(BaseModel):
     blank_std_threshold: float = Field(default=3.0, ge=0.0)
 
 
+class ExtractConfig(BaseModel):
+    backend: Literal["anthropic", "ocr", "replay"] = "anthropic"
+    model: str = "claude-opus-5"
+    # Canvas segments are far too tall to send as one image, so extraction works on
+    # overlapping tiles. The overlap has to exceed the tallest ledger row or a row
+    # landing on a tile boundary is cut in both tiles and read in neither.
+    tile_height: int = Field(default=1400, gt=0)
+    tile_overlap: int = Field(default=260, ge=0)
+    # Money fields are read twice and any disagreement is flagged rather than resolved.
+    money_passes: int = Field(default=2, ge=1)
+    # Bounding-box overlap above which two reads are treated as the same row.
+    same_row_iou: float = Field(default=0.5, gt=0.0, le=1.0)
+    max_tokens: int = Field(default=16000, gt=0)
+
+
 class CropBox(BaseModel):
     """Pixels to remove from each edge of a frame before correlating.
 
@@ -64,6 +79,7 @@ class Config(BaseModel):
 
     fps: float = Field(default=2.0, gt=0)
     frames: FramesConfig = FramesConfig()
+    extract: ExtractConfig = ExtractConfig()
     dedup: DedupConfig = DedupConfig()
     stitch: StitchConfig = StitchConfig()
     work_dir: Path = Path("work")
