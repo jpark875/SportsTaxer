@@ -4,7 +4,7 @@ Turns a screen recording of a sportsbook app's history screen into a reconciled
 transaction ledger, exported to xlsx. Aimed at small books that offer no CSV export and
 no API.
 
-Status: milestone 1 (skeleton). Nothing downstream of the CLI works yet.
+Status: milestone 2. Frame extraction works; stitching and everything after it does not.
 
 ## Requirements
 
@@ -18,6 +18,10 @@ Status: milestone 1 (skeleton). Nothing downstream of the CLI works yet.
 ## Run
 
     sportstaxer --help
+    sportstaxer frames recording.mp4
+
+Artifacts land in `work/<run-id>/`. Each stage reads the previous stage's directory, so a
+failed run resumes rather than restarting.
 
 ## Known failure modes
 
