@@ -34,10 +34,27 @@ class FramesConfig(BaseModel):
     blank_std_threshold: float = Field(default=3.0, ge=0.0)
 
 
+class CropBox(BaseModel):
+    """Pixels to remove from each edge of a frame before correlating.
+
+    Sticky headers, nav bars and the OS status bar do not move with the content, so they
+    have to go before correlation or they pin the offset estimate at zero.
+    """
+
+    top: int = Field(default=0, ge=0)
+    bottom: int = Field(default=0, ge=0)
+    left: int = Field(default=0, ge=0)
+    right: int = Field(default=0, ge=0)
+
+
 class StitchConfig(BaseModel):
     # Cross-correlation score below which the offset estimate is not trusted and a gap
     # marker is recorded instead of splicing.
     min_correlation: float = Field(default=0.9, ge=0.0, le=1.0)
+    # Height of the template strip taken from the middle of the earlier frame. Tall
+    # enough to contain more than one ledger row, short enough that a scroll of half a
+    # screen still leaves it inside the later frame.
+    strip_height: int = Field(default=120, gt=0)
     max_canvas_height: int = Field(default=20_000, gt=0)
     segment_overlap: int = Field(default=400, ge=0)
 

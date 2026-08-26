@@ -138,7 +138,7 @@ def _draw_chrome(
     draw = ImageDraw.Draw(frame)
     width, height = frame.size
     if header_height:
-        draw.rectangle([0, 0, width, header_height], fill=(12, 12, 14))
+        draw.rectangle([0, 0, width, header_height - 1], fill=(12, 12, 14))
         draw.text((16, 8), "Bet History", font=_font(18), fill=(240, 240, 244))
         # A clock that ticks every frame: unchanging chrome and changing chrome both
         # have to be cropped before correlating.
@@ -149,7 +149,7 @@ def _draw_chrome(
             fill=(240, 240, 244),
         )
     if footer_height:
-        draw.rectangle([0, height - footer_height, width, height], fill=(12, 12, 14))
+        draw.rectangle([0, height - footer_height, width, height - 1], fill=(12, 12, 14))
         draw.text(
             (16, height - footer_height + 10),
             "Home   Bets   Account",
