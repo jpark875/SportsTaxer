@@ -1,0 +1,18 @@
+# The synthetic fixture book. Not a real sportsbook: it is the layout produced by
+# sportstaxer.synthetic, and it exists so the pipeline has an end-to-end fixture that
+# needs no recording.
+name: synthbook
+display_name: Synth Book
+payout_includes_stake: false
+crop:
+  top: 60
+  bottom: 50
+date_formats:
+  - "%Y-%m-%d"
+currency:
+  symbol: "$"
+layout_hints: |
+  One bet per row. Row title is the matchup and market. Below it, the settlement date
+  and the result word. Right column holds "Stake $x" above "Payout $y".
+notes: |
+  Payout is the profit, excluding the returned stake, and is zero for a losing bet.
