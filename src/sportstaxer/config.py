@@ -1,0 +1,81 @@
+"""Pipeline configuration: defaults, YAML overrides, resolved paths.
+
+Stage modules take a Config and never read files or environment themselves, so any
+stage can be driven from a test fixture.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+import yaml
+from pydantic import BaseModel, Field, ValidationError
+
+CONFIG_FILENAME = "sportstaxer.yaml"
+
+
+class ConfigError(Exception):
+    pass
+
+
+class DedupConfig(BaseModel):
+    enabled: bool = True
+    # Perceptual hash Hamming distance below which a frame counts as a duplicate of the
+    # previous kept frame. Provisional until measured against a real recording.
+    hash_distance: int = Field(default=4, ge=0)
+
+
+class StitchConfig(BaseModel):
+    # Cross-correlation score below which the offset estimate is not trusted and a gap
+    # marker is recorded instead of splicing.
+    min_correlation: float = Field(default=0.9, ge=0.0, le=1.0)
+    max_canvas_height: int = Field(default=20_000, gt=0)
+    segment_overlap: int = Field(default=400, ge=0)
+
+
+class Config(BaseModel):
+    model_config = {"extra": "forbid"}
+
+    fps: float = Field(default=2.0, gt=0)
+    dedup: DedupConfig = DedupConfig()
+    stitch: StitchConfig = StitchConfig()
+    work_dir: Path = Path("work")
+    adapters_dir: Path = Path("adapters")
+
+    def stage_dir(self, run_id: str, stage: str) -> Path:
+        """Where a stage writes its intermediate artifacts for a given run."""
+        return self.work_dir / run_id / stage
+
+
+def find_config(start: Path) -> Path | None:
+    for directory in [start, *start.parents]:
+        candidate = directory / CONFIG_FILENAME
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def load_config(path: Path | None = None) -> Config:
+    """Load config from path, or from the nearest sportstaxer.yaml, or use defaults."""
+    if path is None:
+        path = find_config(Path.cwd())
+    if path is None:
+        return Config()
+    if not path.is_file():
+        raise ConfigError(f"config file not found: {path}")
+
+    raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    if not isinstance(raw, dict):
+        raise ConfigError(f"config file must contain a mapping: {path}")
+    try:
+        config = Config.model_validate(raw)
+    except ValidationError as exc:
+        raise ConfigError(f"invalid config in {path}:\n{exc}") from exc
+
+    # Relative paths in the file are relative to the file, not the cwd of the caller.
+    base = path.parent
+    if not config.work_dir.is_absolute():
+        config.work_dir = base / config.work_dir
+    if not config.adapters_dir.is_absolute():
+        config.adapters_dir = base / config.adapters_dir
+    return config

@@ -1,0 +1,11 @@
+# Copy to sportstaxer.yaml and edit. Every key is optional; omitted keys take the
+# defaults in src/sportstaxer/config.py.
+fps: 2.0
+dedup:
+  enabled: true
+  hash_distance: 4
+stitch:
+  min_correlation: 0.9
+  max_canvas_height: 20000
+  segment_overlap: 400
+work_dir: work
