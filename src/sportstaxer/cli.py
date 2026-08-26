@@ -8,8 +8,10 @@ import sys
 from pathlib import Path
 
 from sportstaxer import __version__
+from sportstaxer.adapters import AdapterError, list_adapters, load_adapter
 from sportstaxer.config import Config, ConfigError, load_config
-from sportstaxer.frames import FrameExtractionError, extract_frames
+from sportstaxer.frames import FrameExtractionError, extract_frames, load_manifest
+from sportstaxer.stitch import StitchError, stitch
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -28,6 +30,14 @@ def build_parser() -> argparse.ArgumentParser:
     frames.add_argument("--no-dedup", action="store_true", help="keep every sampled frame")
     frames.add_argument("--force", action="store_true", help="re-extract even if a manifest exists")
     frames.set_defaults(func=cmd_frames)
+
+    books = sub.add_parser("books", help="list adapter profiles")
+    books.set_defaults(func=cmd_books)
+
+    stitch_cmd = sub.add_parser("stitch", help="register frames into a canvas")
+    stitch_cmd.add_argument("run_id")
+    stitch_cmd.add_argument("--book", required=True, help="adapter profile name")
+    stitch_cmd.set_defaults(func=cmd_stitch)
     return parser
 
 
@@ -51,6 +61,35 @@ def cmd_frames(config: Config, args: argparse.Namespace) -> int:
         return 1
 
     print(f"{manifest.kept}/{manifest.extracted} frames kept at {config.fps} fps -> {out_dir}")
+    return 0
+
+
+def cmd_books(config: Config, args: argparse.Namespace) -> int:
+    for name in list_adapters(config.adapters_dir):
+        adapter = load_adapter(name, config.adapters_dir)
+        stake = "inclusive" if adapter.payout_includes_stake else "exclusive"
+        print(f"{name:<16} {adapter.display_name:<24} payout {stake} of stake")
+    return 0
+
+
+def cmd_stitch(config: Config, args: argparse.Namespace) -> int:
+    frames_dir = config.stage_dir(args.run_id, "frames")
+    out_dir = config.stage_dir(args.run_id, "canvas")
+    try:
+        adapter = load_adapter(args.book, config.adapters_dir)
+        manifest = load_manifest(frames_dir)
+        canvas = stitch(manifest.kept_paths(frames_dir), out_dir, config, adapter.crop)
+    except (AdapterError, FrameExtractionError, StitchError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+    print(
+        f"canvas {canvas.width}x{canvas.height} in {len(canvas.segments)} segment(s) -> {out_dir}"
+    )
+    if canvas.gaps:
+        print(f"{len(canvas.gaps)} gap(s); reconciliation will refuse this run:", file=sys.stderr)
+        for gap in canvas.gaps:
+            print(f"  frame {gap.frame} at y={gap.offset}: {gap.gap_reason}", file=sys.stderr)
     return 0
 
 
