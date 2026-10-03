@@ -1,13 +1,6 @@
 """Stage 3: canvas to raw rows.
 
-A vision model reads the canvas against a strict JSON schema. Sportsbook history screens
-are dense, styled, multi-column layouts, which is where classical OCR does worst, so the
-OCR path exists as an offline fallback behind the same interface rather than as the
-default.
-
-Money fields are read more than once and any disagreement between passes is recorded as a
-flag. Disagreements are never resolved here: no winner is picked and nothing is averaged.
-The point is to convert a silent error into a visible one.
+Money fields are read more than once. Disagreements are flagged, never resolved.
 """
 
 from __future__ import annotations
@@ -99,10 +92,8 @@ Rules:
 
 
 class AnthropicBackend:
-    """Vision extraction through the Anthropic API.
-
-    The client is constructed lazily so that importing this module, and running every
-    other stage, needs neither the SDK nor an API key.
+    """Vision extraction through the Anthropic API. The client is built lazily so other
+    stages need neither the SDK nor an API key.
     """
 
     def __init__(self, model: str, max_tokens: int, client=None):
@@ -156,11 +147,7 @@ class AnthropicBackend:
 
 
 class ReplayBackend:
-    """Replays recorded responses so fixtures run offline and deterministically.
-
-    Recording a real response once and committing it is what pins the parsing and
-    reconciliation stages without a network call in the test suite.
-    """
+    """Replays recorded responses so fixtures run offline and deterministically."""
 
     def __init__(self, responses_dir: Path):
         self.name = "replay"
@@ -233,12 +220,7 @@ def _to_raw(row: ModelRow, tile: Tile, width: int) -> RawRow:
 
 
 def _find_duplicate(rows: list[RawRow], candidate: RawRow, threshold: float) -> RawRow | None:
-    """Return the already-seen row that `candidate` duplicates, if any.
-
-    Tiles and canvas segments overlap deliberately, so the same bet is read more than
-    once. Matching on bounding boxes rather than on text keeps this a geometric question
-    with a measurable answer.
-    """
+    """Return the already-seen row that `candidate` duplicates by bbox overlap, if any."""
     for existing in rows:
         if existing.bbox.iou(candidate.bbox) >= threshold:
             return existing

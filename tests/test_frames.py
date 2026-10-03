@@ -43,12 +43,7 @@ def test_dropped_frames_are_removed_from_disk(scroll_video, tmp_path):
 
 
 def test_dedup_drops_only_near_duplicates(scroll_video, tmp_path):
-    """Dedup must be derivable from the full frame sequence, not from anything else.
-
-    Run with dedup off, replay the threshold rule over those hashes, and the kept set
-    has to match the deduplicated run exactly. That is the guarantee that dedup is a
-    cost saving and not a change in results.
-    """
+    """Dedup must match the threshold rule replayed over an undeduplicated run."""
     full = extract_frames(
         scroll_video, tmp_path / "full", config_for(tmp_path, dedup={"enabled": False})
     )

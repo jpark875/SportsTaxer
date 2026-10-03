@@ -1,10 +1,6 @@
-"""Types shared by extraction, parsing, reconciliation, review and export.
-
-Two layers on purpose. `RawRow` is what a model or OCR engine said, with confidences and
-pixel provenance and no interpretation. `LedgerRow` (in parse.py) is what the numbers
-mean once an adapter's conventions have been applied. Keeping them apart is what makes it
-possible to re-parse a run without re-extracting it, and to show a reviewer the pixels
-behind a figure.
+"""Types shared across stages. `RawRow` is uninterpreted model or OCR output;
+`LedgerRow` (parse.py) applies adapter conventions. Kept apart so a run can be
+re-parsed without re-extracting.
 """
 
 from __future__ import annotations
@@ -50,11 +46,7 @@ class RawField(BaseModel):
 
 
 class RawRow(BaseModel):
-    """One row as read off the canvas, before any interpretation.
-
-    `bbox` is in canvas coordinates, which is what lets the review UI crop the source
-    pixels for a figure and what the export's provenance column points at.
-    """
+    """One row as read off the canvas. `bbox` is in canvas coordinates."""
 
     date: RawField = RawField()
     description: RawField = RawField()

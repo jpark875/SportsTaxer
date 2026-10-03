@@ -1,6 +1,4 @@
-# The synthetic fixture book. Not a real sportsbook: it is the layout produced by
-# sportstaxer.synthetic, and it exists so the pipeline has an end-to-end fixture that
-# needs no recording.
+# Layout produced by sportstaxer.synthetic. Not a real sportsbook.
 name: synthbook
 display_name: Synth Book
 payout_includes_stake: false

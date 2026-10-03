@@ -1,8 +1,5 @@
-"""Per-sportsbook profiles.
-
-Adding a book means adding a YAML file here and a fixture. No book-specific behaviour
-belongs in pipeline code, so anything a book does differently has to be expressible in
-this schema. If it is not, extend the schema rather than special-casing the book.
+"""Per-sportsbook profiles. Book-specific behaviour belongs in this schema, never in
+pipeline code.
 """
 
 from __future__ import annotations
@@ -28,11 +25,7 @@ class Currency(BaseModel):
 
 
 class Terminology(BaseModel):
-    """Book wording mapped onto the internal vocabulary.
-
-    Books say stake, risk or wager for the same thing, and the result words vary more
-    than they look like they should. Matching is case-insensitive on whole labels.
-    """
+    """Book wording mapped onto the internal vocabulary, case-insensitive on whole labels."""
 
     stake: list[str] = ["stake", "wager", "risk", "bet"]
     payout: list[str] = ["payout", "return", "returns", "paid"]
@@ -49,8 +42,7 @@ class Terminology(BaseModel):
 class Adapter(BaseModel):
     """One sportsbook's profile.
 
-    `payout_includes_stake` has no default on purpose. Guessing it wrong doubles or
-    halves reported winnings, so every profile has to answer it explicitly.
+    `payout_includes_stake` has no default: guessing it wrong doubles or halves winnings.
     """
 
     model_config = {"extra": "forbid"}

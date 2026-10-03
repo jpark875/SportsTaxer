@@ -1,9 +1,6 @@
 """Stage 1: video to deduplicated frames on disk.
 
-ffmpeg samples the video at a fixed rate, then near-duplicate frames are dropped by
-perceptual hash. Dedup is pure cost saving for the stages downstream and must not change
-results: every dropped frame is within the hash threshold of the kept frame before it,
-and the manifest records both so a run can be audited without re-extracting.
+Dedup must not change results; the manifest records dropped frames for auditing.
 """
 
 from __future__ import annotations

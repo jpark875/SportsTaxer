@@ -1,9 +1,5 @@
-"""Classical OCR fallback, behind the same interface as the vision backend.
-
-This exists so a run is possible with no network and no API key. It is not the intended
-path: on dense multi-column history screens it reads amounts fine and column membership
-badly, which is exactly the failure the vision backend avoids. Treat its output as
-something to review, and measure it before trusting it (docs/accuracy.md).
+"""Classical OCR fallback for runs with no network or API key. Reads amounts well and
+column membership badly; review its output before trusting it.
 """
 
 from __future__ import annotations
@@ -16,9 +12,8 @@ from PIL import Image
 from sportstaxer.adapters import Adapter
 from sportstaxer.extract import ExtractionError, ModelField, ModelResponse, ModelRow, Tile
 
-# A row on a phone screen is one visual block of lines. Lines further apart than this
-# belong to different bets. Chosen from the synthetic fixture's 96px row pitch; it is the
-# first thing to retune against a real book.
+# Lines further apart than this belong to different bets. Tuned on the synthetic
+# fixture's 96px row pitch; retune against a real book.
 ROW_GAP_PX = 28
 
 MONEY = re.compile(r"[-(]?\s*[$£€]\s?\d[\d,]*(?:\.\d{2})?\)?")

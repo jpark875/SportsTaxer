@@ -1,10 +1,5 @@
-"""Synthetic scroll fixtures: a tall fake ledger image, sliced into overlapping frames
-with known offsets.
-
-Stitching is checked against these for pixel-exact reconstruction, so the generator has
-to be deterministic for a given seed and has to reproduce the things that break
-correlation in real recordings: sticky chrome that never moves and a clock that changes
-every frame.
+"""Synthetic scroll fixtures: a tall fake ledger cut into overlapping frames with known
+offsets, sticky chrome and a ticking clock. Deterministic per seed.
 """
 
 from __future__ import annotations
@@ -165,11 +160,7 @@ def slice_frames(
     header_height: int = 0,
     footer_height: int = 0,
 ) -> list[Image.Image]:
-    """Cut frames from the canvas at the given offsets, overlaying chrome on each.
-
-    Chrome is drawn over the content the way a sticky header does on a real screen, so
-    the pixels it covers are lost rather than shifted.
-    """
+    """Cut frames at the given offsets, drawing chrome over the content."""
     frames = []
     for i, offset in enumerate(offsets):
         if offset < 0 or offset + frame_height > canvas.height:

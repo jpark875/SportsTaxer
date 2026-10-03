@@ -1,13 +1,6 @@
-"""Stage 2: frames to a stitched canvas.
+"""Stage 2: frames to a stitched canvas by pixel-space registration.
 
-Registration happens in pixel space. A strip from the middle of frame N is
-cross-correlated against frame N+1 to recover the vertical scroll, offsets accumulate,
-and every frame is composited onto one tall canvas that gets OCR'd once.
-
-The alternative, OCR per frame plus fuzzy row dedup, has to guess whether two extracted
-rows are the same bet and has no principled confidence measure. Image registration
-returns a correlation score, and rows end up truncated only at the edges of the finished
-canvas rather than at every frame boundary.
+Preferred over per-frame OCR plus fuzzy row dedup, which has no confidence measure.
 """
 
 from __future__ import annotations
@@ -23,10 +16,8 @@ from sportstaxer.config import Config, CropBox
 
 MANIFEST_NAME = "canvas.json"
 
-# Rows left above the template strip in the later frame. Small, because everything above
-# it is scroll range given up: the largest measurable scroll is the frame height less the
-# strip and this margin. It exists only so a few pixels of upward drift still register as
-# a negative delta rather than as an unexplained correlation failure.
+# Lets slight upward drift register as a negative delta. Kept small because it costs
+# measurable scroll range.
 SEARCH_MARGIN = 8
 
 
@@ -54,11 +45,8 @@ class CanvasSegment(BaseModel):
 
 
 class CanvasManifest(BaseModel):
-    """Where every frame landed on the canvas, and where the canvas cannot be trusted.
-
-    Consumers must treat `gaps` as fatal for reconciliation: a gap means the scroll
-    jumped further than the frame overlap and content between the two frames was never
-    recorded.
+    """Frame placements on the canvas. `gaps` mark unrecorded content and are fatal for
+    reconciliation.
     """
 
     frames_dir: Path
@@ -110,19 +98,10 @@ def _match(target: np.ndarray, template_frame: np.ndarray, strip_height: int) ->
 def measure_offset(
     previous: np.ndarray, current: np.ndarray, strip_height: int
 ) -> tuple[int, float]:
-    """Return (scroll delta, correlation) between two cropped frames.
+    """Return (scroll delta, correlation). A positive delta is a downward scroll.
 
-    A positive delta means the content moved up the screen, which is a downward scroll.
-
-    The template comes from the top of the later frame and is searched for in the earlier
-    one. Taking it from the middle of the earlier frame instead does not work at the
-    overlap the capture protocol asks for: at a half-screen scroll the middle of frame N
-    is off the top of frame N+1, so there is nothing to match and every pair reads as a
-    gap.
-
-    Measurable scrolls run from -SEARCH_MARGIN to (frame height - strip - SEARCH_MARGIN).
-    Anything outside that falls out as a low correlation, which is reported as a gap
-    rather than guessed at.
+    The template comes from the top of the later frame. Taking it from the middle of the
+    earlier frame fails at half-screen scrolls. Out-of-range scrolls read as gaps.
     """
     if strip_height + 2 * SEARCH_MARGIN >= previous.shape[0]:
         raise StitchError(f"strip height {strip_height} does not fit a {previous.shape[0]}px frame")

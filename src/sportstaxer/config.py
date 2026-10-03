@@ -1,8 +1,4 @@
-"""Pipeline configuration: defaults, YAML overrides, resolved paths.
-
-Stage modules take a Config and never read files or environment themselves, so any
-stage can be driven from a test fixture.
-"""
+"""Pipeline configuration. Stages take a Config and never read files or env themselves."""
 
 from __future__ import annotations
 
@@ -37,9 +33,7 @@ class FramesConfig(BaseModel):
 class ExtractConfig(BaseModel):
     backend: Literal["anthropic", "ocr", "replay"] = "anthropic"
     model: str = "claude-opus-5"
-    # Canvas segments are far too tall to send as one image, so extraction works on
-    # overlapping tiles. The overlap has to exceed the tallest ledger row or a row
-    # landing on a tile boundary is cut in both tiles and read in neither.
+    # Overlap must exceed the tallest ledger row or a boundary row is read in neither tile.
     tile_height: int = Field(default=1400, gt=0)
     tile_overlap: int = Field(default=260, ge=0)
     # Money fields are read twice and any disagreement is flagged rather than resolved.
@@ -50,11 +44,7 @@ class ExtractConfig(BaseModel):
 
 
 class CropBox(BaseModel):
-    """Pixels to remove from each edge of a frame before correlating.
-
-    Sticky headers, nav bars and the OS status bar do not move with the content, so they
-    have to go before correlation or they pin the offset estimate at zero.
-    """
+    """Pixels to crop from each edge. Sticky chrome left in pins the offset estimate at zero."""
 
     top: int = Field(default=0, ge=0)
     bottom: int = Field(default=0, ge=0)
@@ -66,9 +56,7 @@ class StitchConfig(BaseModel):
     # Cross-correlation score below which the offset estimate is not trusted and a gap
     # marker is recorded instead of splicing.
     min_correlation: float = Field(default=0.9, ge=0.0, le=1.0)
-    # Height of the template strip taken from the middle of the earlier frame. Tall
-    # enough to contain more than one ledger row, short enough that a scroll of half a
-    # screen still leaves it inside the later frame.
+    # Taller than one ledger row, short enough to survive a half-screen scroll.
     strip_height: int = Field(default=120, gt=0)
     max_canvas_height: int = Field(default=20_000, gt=0)
     segment_overlap: int = Field(default=400, ge=0)
