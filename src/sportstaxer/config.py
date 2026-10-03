@@ -32,7 +32,7 @@ class FramesConfig(BaseModel):
 
 class ExtractConfig(BaseModel):
     backend: Literal["anthropic", "ocr", "replay"] = "anthropic"
-    model: str = "claude-opus-5"
+    model: str = "claude-opus-5-5"
     # Overlap must exceed the tallest ledger row or a boundary row is read in neither tile.
     tile_height: int = Field(default=1400, gt=0)
     tile_overlap: int = Field(default=260, ge=0)
@@ -62,6 +62,13 @@ class StitchConfig(BaseModel):
     segment_overlap: int = Field(default=400, ge=0)
 
 
+class LedgerConfig(BaseModel):
+    # Fields read below this confidence put the row on the review list.
+    min_confidence: float = Field(default=0.8, ge=0.0, le=1.0)
+    # History screens often omit the year; used for date formats that lack %Y.
+    assume_year: int | None = None
+
+
 class Config(BaseModel):
     model_config = {"extra": "forbid"}
 
@@ -70,7 +77,9 @@ class Config(BaseModel):
     extract: ExtractConfig = ExtractConfig()
     dedup: DedupConfig = DedupConfig()
     stitch: StitchConfig = StitchConfig()
+    ledger: LedgerConfig = LedgerConfig()
     work_dir: Path = Path("work")
+    out_dir: Path = Path("out")
     adapters_dir: Path = Path("adapters")
 
     def stage_dir(self, run_id: str, stage: str) -> Path:
@@ -107,6 +116,8 @@ def load_config(path: Path | None = None) -> Config:
     base = path.parent
     if not config.work_dir.is_absolute():
         config.work_dir = base / config.work_dir
+    if not config.out_dir.is_absolute():
+        config.out_dir = base / config.out_dir
     if not config.adapters_dir.is_absolute():
         config.adapters_dir = base / config.adapters_dir
     return config

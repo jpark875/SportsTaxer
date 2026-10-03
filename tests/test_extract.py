@@ -242,7 +242,7 @@ def test_anthropic_backend_sends_the_image_and_schema(canvas):
             return Response()
 
     recorder = Recorder()
-    backend = AnthropicBackend("claude-opus-5", 16000, client=recorder)
+    backend = AnthropicBackend("claude-opus-5-5", 16000, client=recorder)
     tile = Tile(segment=0, index=0, y_offset=0, image_path=Path("unused"))
 
     response = backend.read_tile(tile, Image.new("RGB", (720, 400), (20, 20, 20)), ADAPTER)
@@ -251,5 +251,5 @@ def test_anthropic_backend_sends_the_image_and_schema(canvas):
     content = recorder.kwargs["messages"][0]["content"]
     assert content[0]["type"] == "image"
     assert content[0]["source"]["media_type"] == "image/png"
-    assert json.loads(json.dumps(recorder.kwargs["model"])) == "claude-opus-5"
+    assert json.loads(json.dumps(recorder.kwargs["model"])) == "claude-opus-5-5"
     assert recorder.kwargs["output_format"] is ModelResponse

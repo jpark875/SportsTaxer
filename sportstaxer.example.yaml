@@ -11,4 +11,11 @@ stitch:
   min_correlation: 0.9
   max_canvas_height: 20000
   segment_overlap: 400
+extract:
+  backend: anthropic
+  money_passes: 2
+ledger:
+  min_confidence: 0.8
+  # assume_year: 2025
 work_dir: work
+out_dir: out

@@ -94,3 +94,13 @@ An adapter profile that omits it fails to load. Every other field can fall back 
 something sensible, but guessing this one wrong changes reported gross winnings by the
 stake on every settled bet, and it is not detectable downstream without a balance to
 reconcile against.
+
+## 2026-09-02 - ledger arithmetic lives in one function
+
+`compute_net` maps result, stake, payout and `payout_includes_stake` to the balance
+effect, and everything downstream (reconciliation, summary) reads `net`. A row whose net
+cannot be computed keeps `None` rather than zero, so it is reported instead of silently
+balancing the books. Pushes are zero whatever payout was read.
+
+Reconciliation refuses a canvas with gaps, and a mismatch still exports so the discrepancy
+can be inspected next to the rows; the exit status carries the failure.
