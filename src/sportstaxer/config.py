@@ -1,4 +1,4 @@
-"""Pipeline configuration. Stages take a Config and never read files or env themselves."""
+"""Pipeline configuration."""
 
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ class ExtractConfig(BaseModel):
 
 
 class CropBox(BaseModel):
-    """Pixels to crop from each edge. Sticky chrome left in pins the offset estimate at zero."""
+    """Pixels to crop from each edge."""
 
     top: int = Field(default=0, ge=0)
     bottom: int = Field(default=0, ge=0)

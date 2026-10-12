@@ -1,6 +1,4 @@
-"""Per-sportsbook profiles. Book-specific behaviour belongs in this schema, never in
-pipeline code.
-"""
+"""Per-sportsbook profiles."""
 
 from __future__ import annotations
 
@@ -25,7 +23,8 @@ class Currency(BaseModel):
 
 
 class Terminology(BaseModel):
-    """Book wording mapped onto the internal vocabulary, case-insensitive on whole labels."""
+    """Book wording mapped onto the internal vocabulary, case-insensitive on whole labels.
+    """
 
     stake: list[str] = ["stake", "wager", "risk", "bet"]
     payout: list[str] = ["payout", "return", "returns", "paid"]
@@ -40,10 +39,7 @@ class Terminology(BaseModel):
 
 
 class Adapter(BaseModel):
-    """One sportsbook's profile.
-
-    `payout_includes_stake` has no default: guessing it wrong doubles or halves winnings.
-    """
+    """One sportsbook's profile."""
 
     model_config = {"extra": "forbid"}
 

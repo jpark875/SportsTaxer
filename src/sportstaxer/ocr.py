@@ -1,6 +1,4 @@
-"""Classical OCR fallback for runs with no network or API key. Reads amounts well and
-column membership badly; review its output before trusting it.
-"""
+"""Classical OCR fallback for runs with no network or API key."""
 
 from __future__ import annotations
 

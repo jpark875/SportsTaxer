@@ -36,11 +36,7 @@ def reconcile(
     closing: Decimal | None = None,
     tolerance: Decimal = Decimal("0.005"),
 ) -> Reconciliation:
-    """Compare opening plus every row's net against the closing balance.
-
-    A canvas with gaps is refused outright: the missing content is unrecorded, so any
-    comparison would be meaningless. Unknown nets are reported, never assumed zero.
-    """
+    """Compare opening plus every row's net against the closing balance."""
     if manifest.gaps:
         raise ReconcileError(
             f"canvas has {len(manifest.gaps)} gap(s); re-record the run with more overlap"

@@ -49,7 +49,7 @@ class ParseError(Exception):
 
 
 def parse_money(text: str | None, currency: Currency) -> Decimal | None:
-    """Parse an amount as written on screen. Returns None for empty text, raises on junk."""
+    """Parse an amount as written on screen."""
     if text is None or not text.strip():
         return None
     cleaned = text.strip().replace(currency.symbol, "").replace(" ", "")
@@ -117,7 +117,7 @@ def classify_result(label: str | None, adapter: Adapter) -> Result:
 def compute_net(
     result: Result, stake: Decimal | None, payout: Decimal | None, includes_stake: bool
 ) -> Decimal | None:
-    """Effect on the balance. Needs the amounts the result implies; otherwise None."""
+    """Effect on the balance."""
     if result == Result.PUSH:
         return Decimal("0")
     if result == Result.LOST:
@@ -194,7 +194,7 @@ def parse_row(row: RawRow, adapter: Adapter, min_confidence: float, year: int | 
 def parse_extraction(
     extraction: ExtractionResult, adapter: Adapter, config: Config
 ) -> list[LedgerRow]:
-    """Convert every extracted row. Rows are never dropped, only flagged."""
+    """Convert every extracted row."""
     rows = [
         parse_row(raw, adapter, config.ledger.min_confidence, config.ledger.assume_year)
         for raw in extraction.rows

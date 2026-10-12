@@ -1,7 +1,4 @@
-"""Stage 2: frames to a stitched canvas by pixel-space registration.
-
-Preferred over per-frame OCR plus fuzzy row dedup, which has no confidence measure.
-"""
+"""Stage 2: frames to a stitched canvas by pixel-space registration."""
 
 from __future__ import annotations
 
@@ -45,9 +42,7 @@ class CanvasSegment(BaseModel):
 
 
 class CanvasManifest(BaseModel):
-    """Frame placements on the canvas. `gaps` mark unrecorded content and are fatal for
-    reconciliation.
-    """
+    """Frame placements on the canvas."""
 
     frames_dir: Path
     crop: CropBox
@@ -98,11 +93,7 @@ def _match(target: np.ndarray, template_frame: np.ndarray, strip_height: int) ->
 def measure_offset(
     previous: np.ndarray, current: np.ndarray, strip_height: int
 ) -> tuple[int, float]:
-    """Return (scroll delta, correlation). A positive delta is a downward scroll.
-
-    The template comes from the top of the later frame. Taking it from the middle of the
-    earlier frame fails at half-screen scrolls. Out-of-range scrolls read as gaps.
-    """
+    """Return (scroll delta, correlation)."""
     if strip_height + 2 * SEARCH_MARGIN >= previous.shape[0]:
         raise StitchError(f"strip height {strip_height} does not fit a {previous.shape[0]}px frame")
     return _match(previous, current, strip_height)
@@ -111,7 +102,8 @@ def measure_offset(
 def measure_reverse(
     previous: np.ndarray, current: np.ndarray, strip_height: int
 ) -> tuple[int, float]:
-    """Measure with the frames swapped, to name an upward scroll instead of just failing."""
+    """Measure with the frames swapped, to name an upward scroll instead of just failing.
+    """
     back, score = _match(current, previous, strip_height)
     return -back, score
 
@@ -191,7 +183,8 @@ def stitch(
     config: Config,
     crop: CropBox | None = None,
 ) -> CanvasManifest:
-    """Composite frames into one or more canvas images and write them with a manifest."""
+    """Composite frames into one or more canvas images and write them with a manifest.
+    """
     crop = crop or CropBox()
     placements = plan_placements(frame_paths, config, crop)
 

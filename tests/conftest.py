@@ -8,7 +8,8 @@ from sportstaxer.synthetic import make_capture
 
 
 def encode(frames, path: Path, fps: float = 2.0, hold: int = 2) -> Path:
-    """Encode frames to h264, holding each for `hold` frames to mimic the scroll pause."""
+    """Encode frames to h264, holding each for `hold` frames to mimic the scroll pause.
+    """
     staging = path.parent / f"{path.stem}_src"
     staging.mkdir(parents=True, exist_ok=True)
     n = 0

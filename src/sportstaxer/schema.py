@@ -1,7 +1,4 @@
-"""Types shared across stages. `RawRow` is uninterpreted model or OCR output;
-`LedgerRow` (parse.py) applies adapter conventions. Kept apart so a run can be
-re-parsed without re-extracting.
-"""
+"""Types shared across stages."""
 
 from __future__ import annotations
 
@@ -46,7 +43,7 @@ class RawField(BaseModel):
 
 
 class RawRow(BaseModel):
-    """One row as read off the canvas. `bbox` is in canvas coordinates."""
+    """One row as read off the canvas."""
 
     date: RawField = RawField()
     description: RawField = RawField()

@@ -1,7 +1,4 @@
-"""Stage 1: video to deduplicated frames on disk.
-
-Dedup must not change results; the manifest records dropped frames for auditing.
-"""
+"""Stage 1: video to deduplicated frames on disk."""
 
 from __future__ import annotations
 

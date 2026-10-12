@@ -1,5 +1,4 @@
-"""CLI entry point. Each pipeline stage gets its own subcommand so stages can run
-standalone against artifacts on disk."""
+"""CLI entry point."""
 
 from __future__ import annotations
 

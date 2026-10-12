@@ -1,7 +1,4 @@
-"""Stage 3: canvas to raw rows.
-
-Money fields are read more than once. Disagreements are flagged, never resolved.
-"""
+"""Stage 3: canvas to raw rows."""
 
 from __future__ import annotations
 
@@ -42,7 +39,7 @@ class ModelField(BaseModel):
 
 
 class ModelRow(BaseModel):
-    """The per-row schema handed to the model. Coordinates are tile-relative."""
+    """The per-row schema handed to the model."""
 
     date: ModelField
     description: ModelField
@@ -92,9 +89,7 @@ Rules:
 
 
 class AnthropicBackend:
-    """Vision extraction through the Anthropic API. The client is built lazily so other
-    stages need neither the SDK nor an API key.
-    """
+    """Vision extraction through the Anthropic API."""
 
     def __init__(self, model: str, max_tokens: int, client=None):
         self.name = "anthropic"
@@ -220,7 +215,8 @@ def _to_raw(row: ModelRow, tile: Tile, width: int) -> RawRow:
 
 
 def _find_duplicate(rows: list[RawRow], candidate: RawRow, threshold: float) -> RawRow | None:
-    """Return the already-seen row that `candidate` duplicates by bbox overlap, if any."""
+    """Return the already-seen row that `candidate` duplicates by bbox overlap, if any.
+    """
     for existing in rows:
         if existing.bbox.iou(candidate.bbox) >= threshold:
             return existing

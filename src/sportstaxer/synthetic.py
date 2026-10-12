@@ -1,5 +1,5 @@
 """Synthetic scroll fixtures: a tall fake ledger cut into overlapping frames with known
-offsets, sticky chrome and a ticking clock. Deterministic per seed.
+offsets, sticky chrome and a ticking clock.
 """
 
 from __future__ import annotations

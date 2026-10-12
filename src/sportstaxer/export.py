@@ -145,7 +145,7 @@ def _review_sheet(workbook: Workbook, rows: list[LedgerRow]) -> None:
 
 
 def export_xlsx(rows: list[LedgerRow], recon: Reconciliation, path: Path) -> Path:
-    """Write the workbook. `Ledger row` on the Review sheet is the sheet row number."""
+    """Write the workbook."""
     workbook = Workbook()
     _ledger_sheet(workbook, rows)
     _summary_sheet(workbook, rows, recon)

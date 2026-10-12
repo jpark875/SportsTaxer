@@ -187,8 +187,9 @@ def test_crop_that_removes_everything_is_an_error(tmp_path):
 
 
 def test_scroll_larger_than_the_measurable_range_is_flagged(tmp_path):
-    """A 600px scroll on a 640px frame leaves 40px of overlap: real content, but less
-    than the correlation window needs. Flagged rather than assumed."""
+    """A 600px scroll on a 640px frame leaves 40px of overlap: real content, but less than
+    the correlation window needs.
+    """
     from sportstaxer.synthetic import make_rows, render_canvas, slice_frames
 
     canvas = render_canvas(make_rows(40, seed=11))

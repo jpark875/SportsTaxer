@@ -1,4 +1,5 @@
-"""Whole pipeline on a synthetic recording, with the model replaced by recorded answers."""
+"""Whole pipeline on a synthetic recording, with the model replaced by recorded answers.
+"""
 
 from decimal import Decimal
 from pathlib import Path
