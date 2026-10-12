@@ -124,7 +124,15 @@ def cmd_frames(config: Config, args: argparse.Namespace) -> int:
 
 
 def cmd_books(config: Config, args: argparse.Namespace) -> int:
-    for name in list_adapters(config.adapters_dir):
+    names = list_adapters(config.adapters_dir)
+    if not names:
+        print(
+            f"no adapter profiles in {config.adapters_dir}; run from the project directory "
+            "or set adapters_dir in the config",
+            file=sys.stderr,
+        )
+        return 1
+    for name in names:
         adapter = load_adapter(name, config.adapters_dir)
         stake = "inclusive" if adapter.payout_includes_stake else "exclusive"
         print(f"{name:<16} {adapter.display_name:<24} payout {stake} of stake")

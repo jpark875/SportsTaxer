@@ -65,3 +65,12 @@ def test_stitch_reports_an_unknown_book(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
     assert main(["stitch", "r1", "--book", "nosuchbook"]) == 1
     assert "no adapter profile" in capsys.readouterr().err
+
+
+def test_books_lists_profiles_and_explains_when_none_found(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(Path(__file__).resolve().parents[1])
+    assert main(["books"]) == 0
+    assert "synthbook" in capsys.readouterr().out
+    monkeypatch.chdir(tmp_path)
+    assert main(["books"]) == 1
+    assert "no adapter profiles" in capsys.readouterr().err
